@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Lista de Clientes</h2>
+
+        <!-- Formulario de búsqueda -->
+        <form class="d-flex mb-3" method="GET" action="{{ url_for('index') }}">
+            <input class="form-control me-2" type="search" placeholder="Buscar cliente" aria-label="Search" name="query" value="{{ request.args.get('query', '') }}">
+            <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
+
+        <!-- Enlace para agregar un cliente -->
+        <a href="{{ url_for('agregar_cliente') }}" class="btn btn-primary mb-3">Agregar Cliente</a>
+
+        <!-- Tabla de clientes -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente['ID'] }}</td>
+                        <td>{{ cliente['nombre'] }}</td>
+                        <td>{{ cliente['apellido'] }}</td>
+                        <td>{{ cliente['dni'] }}</td>
+                        <td>{{ cliente['telefono'] }}</td>
+                        <td>
+                            <a href="{{ url_for('editar_cliente', id=cliente['ID']) }}" class="btn btn-warning btn-sm">Editar</a>
+                            <form action="{{ url_for('eliminar_cliente', id=cliente['ID']) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
