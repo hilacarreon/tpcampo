@@ -1,28 +1,25 @@
 {% extends "base.html" %}
-
 {% block title %}Gestión de Clientes{% endblock %}
-
 {% block content %}
+
 <div class="container mt-5">
     <h1 class="mb-4">Gestión de Clientes</h1>
 
     <div class="row mb-3">
         <div class="col-md-6">
-            <form method="GET" action="{{ url_for('index') }}" class="d-flex">
-                <input type="search" name="query" class="form-control me-2" placeholder="Buscar por nombre, apellido o DNI" value="{{ query }}">
-                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            <form class="d-flex" role="search" action="{{ url_for('index') }}">
+                <input class="form-control me-2" type="search" name="query" placeholder="Buscar" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Buscar</button>
             </form>
         </div>
         <div class="col-md-6 text-end">
-            <a href="{{ url_for('agregar_cliente') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-1"></i>Agregar Cliente
-            </a>
+            <a href="{{ url_for('agregar_cliente') }}" class="btn btn-primary">Agregar Cliente</a>
         </div>
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-light">
+        <table class="table table-striped">
+            <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
@@ -41,37 +38,17 @@
                     <td>{{ cliente.dni }}</td>
                     <td>{{ cliente.telefono }}</td>
                     <td>
+                        <div class="btn-group me-2" role="group">
+                            <a href="{{ url_for('editar_cliente', id=cliente.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                        </div>
+                        <div class="btn-group me-2" role="group">
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ cliente.id }}">Eliminar</button>
+                        </div>
                         <div class="btn-group" role="group">
-                            <a href="{{ url_for('editar_cliente', id=cliente.id) }}" class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil me-1"></i>Editar
-                            </a>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ cliente.id }}">
-                                <i class="bi bi-trash me-1"></i>Eliminar
-                            </button>
+                            <a href="{{ url_for('ver_conexiones', id=cliente.id) }}" class="btn btn-primary btn-sm">Conexiones</a>
                         </div>
                     </td>
                 </tr>
-                
-                <!-- Modal de Confirmación de Eliminación -->
-                <div class="modal fade" id="deleteModal{{ cliente.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ cliente.id }}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="deleteModalLabel{{ cliente.id }}">Confirmar Eliminación</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                ¿Está seguro que desea eliminar al cliente <strong>{{ cliente.nombre }} {{ cliente.apellido }}</strong>?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <form method="POST" action="{{ url_for('eliminar_cliente', id=cliente.id) }}" class="d-inline">
-                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 {% else %}
                 <tr>
                     <td colspan="6" class="text-center">No se encontraron clientes</td>
@@ -81,4 +58,27 @@
         </table>
     </div>
 </div>
+
+{% for cliente in clientes %}
+<div class="modal fade" id="deleteModal{{ cliente.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ cliente.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ cliente.id }}">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar al cliente <strong>{{ cliente.nombre }} {{ cliente.apellido }}</strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{{ url_for('eliminar_cliente', id=cliente.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 {% endblock %}

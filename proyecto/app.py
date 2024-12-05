@@ -201,5 +201,25 @@ def eliminar_cliente(id):
         flash(f'Error al eliminar cliente: {e}', 'error')
         return redirect(url_for('index'))
 
+@app.route('/conexiones/<int:id>', methods=['GET'])
+def ver_conexiones(id):
+    conn = get_db_connection()
+    if not conn:
+        return redirect(url_for('index'))
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM cliente WHERE id = %s", (id,))
+        cliente = cursor.fetchone()
+        cursor.execute("SELECT * FROM conexion WHERE idCliente = %s", (id,))
+        conexiones = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return render_template('conexiones.html', conexiones=conexiones, cliente_nombre=cliente['nombre'], cliente_apellido=cliente['apellido'])
+    
+    except Error as e:
+        flash(f'Error al obtener conexiones: {e}', 'error')
+        return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

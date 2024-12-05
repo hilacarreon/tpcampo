@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Cliente: {{ cliente_nombre }} {{ cliente_apellido }}{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Cliente: {{ cliente_nombre }} {{ cliente_apellido }}</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Fecha de Alta</th>
+                    <th>Domicilio</th>
+                    <th>Localidad</th>
+                    <th>Servicio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if conexiones %}
+                {% for conexion in conexiones %}
+                <tr>
+                    <td>{{ conexion.numero }}</td>
+                    <td>{{ conexion.fecha_alta }}</td>
+                    <td>{{ conexion.domicilio }}</td>
+                    <td>{{ conexion.localidad }}</td>
+                    <td>{{ conexion.servicio }}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('modificar_conexion', id=conexion.id) }}" class="btn btn-warning btn-sm">Modificar</a>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ conexion.id }}">Eliminar</button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">El cliente no tiene conexiones registradas.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
