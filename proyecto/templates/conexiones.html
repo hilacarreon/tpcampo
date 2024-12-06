@@ -1,8 +1,15 @@
 {% extends "base.html" %}
+
 {% block title %}Cliente: {{ cliente_nombre }} {{ cliente_apellido }}{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <h1>Cliente: {{ cliente_nombre }} {{ cliente_apellido }}</h1>
+    <h1>
+        Cliente: {{ cliente_nombre }} {{ cliente_apellido }}
+        <!-- Botón Agregar Conexión alineado a la derecha -->
+        <a href="#" class="btn btn-primary float-end mt-3">+ Agregar Conexión </a>
+    </h1>
+
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

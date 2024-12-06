@@ -43,7 +43,19 @@ def validate_input(nombre, apellido, dni, telefono):
 
 @app.route('/', methods=['GET'])
 def index():
+    # Get query and sorting parameters
     query = request.args.get('query', '')
+    sort_by = request.args.get('sort_by', 'id')  # Default sort by ID
+    sort_order = request.args.get('sort_order', 'desc')  # Default descending order
+
+    # Validate sort_by and sort_order to prevent SQL injection
+    valid_columns = ['id', 'nombre', 'apellido']
+    valid_orders = ['asc', 'desc']
+    
+    if sort_by not in valid_columns:
+        sort_by = 'id'
+    if sort_order not in valid_orders:
+        sort_order = 'desc'
 
     conn = get_db_connection()
     if not conn:
@@ -52,23 +64,37 @@ def index():
     try:
         cursor = conn.cursor(dictionary=True)
         
+        # Construct dynamic SQL query with sorting
+        base_query = """
+            SELECT * FROM cliente 
+            WHERE 1=1
+        """
+        
+        # Add search condition if query exists
         if query:
-            cursor.execute("""
-                SELECT * FROM cliente 
-                WHERE nombre LIKE %s OR apellido LIKE %s OR dni LIKE %s
-            """, ('%' + query + '%', '%' + query + '%', '%' + query + '%'))
-        else:
-            cursor.execute("SELECT * FROM cliente ORDER BY id DESC")
+            base_query += """ 
+                AND (nombre LIKE '%{}%' 
+                OR apellido LIKE '%{}%' 
+                OR dni LIKE '%{}%')
+            """.format(query, query, query)
+        
+        # Add sorting
+        base_query += " ORDER BY {} {}".format(sort_by, sort_order)
 
+        cursor.execute(base_query)
         clientes = cursor.fetchall()
         cursor.close()
         conn.close()
-        return render_template('index.html', clientes=clientes, query=query)
+        
+        return render_template('index.html', 
+                               clientes=clientes, 
+                               query=query, 
+                               sort_by=sort_by, 
+                               sort_order=sort_order)
     
     except Error as e:
         flash(f'Error al recuperar clientes: {e}', 'error')
         return render_template('index.html', clientes=[], query=query)
-
 @app.route('/agregar', methods=['GET', 'POST'])
 def agregar_cliente():
     if request.method == 'POST':
